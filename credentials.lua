@@ -1,2 +1,0 @@
-SSID ="asanka123"
-PASS ="12345678"
