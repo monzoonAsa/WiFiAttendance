@@ -1,5 +1,5 @@
 print("start crwodtrace")
-
+mqtt_server = MQTT
 station_cfg={}
 station_cfg.ssid=SSID
 station_cfg.pwd=PASS

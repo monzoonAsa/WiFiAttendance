@@ -10,7 +10,7 @@ led_pin = 5
 gpio.mode(button_pin, gpio.INT, gpio.PULLUP)
 gpio.mode(led_pin, gpio.OUTPUT)   
 
-mqtt_server = "192.168.8.100"; 
+
 net_tag = 0;            --to have extendable networks
 
 net_retry = 50              --Number of retries
@@ -29,6 +29,7 @@ if file.open("credentials.lua") then
     dofile("credentials.lua")
     print("saved SSID :-",SSID)
     print("saved Password :-",PASS)
+    print("saved mqtt :-",MQTT)
     dofile("crowdIni.lua")
     dofile("reset_conf.lua")
 

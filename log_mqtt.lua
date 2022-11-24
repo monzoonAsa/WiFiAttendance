@@ -3,6 +3,7 @@
 --Change the wifi ssid and the password 
 --If you need static ip addressing you can add them by uncommenting the following lines
 print("logmqtt start")
+print("mqtt server = ",mqtt_server)
 print("node id:-",node.chipid())
 ch = 1;
 
@@ -77,7 +78,7 @@ j=1;
 change_ch = tmr.create()
 change_ch:register(channel_time, tmr.ALARM_AUTO, function() 
     --print("ch:"..ch);
-    print("chanel start")
+    print(ch)
     ch = ch +1;
     if ch == 16 then
         ch=1;
