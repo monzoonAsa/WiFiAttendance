@@ -132,9 +132,10 @@ else:
 TablePeopleData="""
 	 drop table if exists peopleData ;
 	 create table peopleData(
+	 id integer primary key autoincrement,
   	 name text,
-  	 indexNo text,
-  	 mac text unique
+  	 mac text,
+  	 indexNo text
   	 
 	);
 
@@ -146,7 +147,7 @@ print("tabel create done")
 file = open("test.csv")
 print("fle open done")
 content = csv.reader(file)
-insertRecords="insert into peopleData (name,indexNo,mac) values( ?,?,?)"
+insertRecords="insert into peopleData (name,mac,indexNo) values( ?,?,?)"
 curs.executemany(insertRecords, content)
 print("csv data saved")
 conn.commit()
