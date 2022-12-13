@@ -62,44 +62,74 @@ class DatabaseManager():
 def crowdtraceDataHandler(jsonData):
 	#Parse Data 
 	json_Dict = json.loads(jsonData)
-	#print("qsdsa",json_Dict)
-	#if json_Dict!=1 or json_Dict!=2 or json_Dict!=3:
+	
 	node = json_Dict['node']
-	mac = json_Dict['mac']
+	macAddress = json_Dict['mac']
 	rssi = json_Dict['rssi']
 	packets = json_Dict['packets']
 	net_tag = json_Dict['net_tag']
+ 
+	##VALIDATE DATA BEFORE WRITE WTH USER DEFINED TABLE
+	#print("validation ekata awa")
+	
+	
+	conn = sqlite3.connect(DB_Name)
+	curs = conn.cursor()
+	print(macAddress)
+
+	curs.execute("SELECT * FROM peopleData")
+		
+	datanew= curs.fetchall()
+	#print(datanew)
+	
+	for row in datanew:
+		#print(row[2])
+		if row[2] == macAddress:
+			#print("address equal")
+				#Push into DB Table
+			try:
+				dbObj = DatabaseManager()
+				dbObj.add_del_update_db_record("insert into crData (mac,name,indexNo) values (?,?,?)",[macAddress,row[1],row[3]])
+				del dbObj
+				print ("Inserted crowdtrace Data into Database.")
+				print ("")
+			except:
+				print("data set alredy in database")
+				pass	
+			
+		
 
 		
+	#print(newdata)
+	curs.close()
+	conn.close()
 	
-	#Push into DB Table
-	try:
-		dbObj = DatabaseManager()
-		dbObj.add_del_update_db_record("insert into crData (node,mac, rssi, packets, net_tag) values (?,?,?,?,?)",[node, mac, rssi, packets, net_tag])
-		del dbObj
-		print ("Inserted crowdtrace Data into Database.")
-		print ("")
-	except:
-		print("data set alredy in database")
-		pass	
+	
+	
+		
+	
+
+		
 ########################################
 
 # SQLite DB Name
 DB_Name =  "crowd.db"
 # SQLite DB Table Schema
+#change the table only get mac and name and index no
 TableSchema="""
 	 drop table if exists crData ;
 	 create table crData(
   	 id integer primary key autoincrement,
-  	 node text,
   	 mac text unique,
-  	 rssi text,
-  	 packets text,
-  	 net_tag text
+  	 name text,
+  	 indexNo text
+
   
 	);
 
 	"""	
+
+#ton get all data written in database just delete unique in mac on TableSchama
 #in here unique constant use for not duplicating data on database
 #main program start here------------->>>>>>
 
@@ -107,8 +137,20 @@ TableSchema="""
 path_to_file = 'crowd.db' #database file name or path
 path = Path(path_to_file)
 
-if path.is_file():# to check DB file exist or not
+if path.is_file():# to check DB file exist or not if exist delete crData table for save new data
 	print("The databse file exists")
+	conn = sqlite3.connect(DB_Name)
+	curs = conn.cursor()
+	try:
+		curs.executescript("DROP TABLE crData")
+		print("crData table deleted")
+	except:
+		print("crData table delete unsusscesfully because already deleted")
+	
+	curs.executescript(TableSchema)
+	curs.close()
+	conn.close()
+	
 else:
 	print("The file {path_to_file} does not exist create new DB file..")
 	
@@ -117,7 +159,6 @@ else:
 	
 #create db table
 # SQLite DB Name
-	DB_Name =  "crowd.db"
 	conn = sqlite3.connect(DB_Name)
 	curs = conn.cursor()
 	curs.executescript(TableSchema)
@@ -128,7 +169,7 @@ else:
 	
 ###############################################
 #import csv file data to new table
-
+#table to save user define peoples data from csv file
 TablePeopleData="""
 	 drop table if exists peopleData ;
 	 create table peopleData(
