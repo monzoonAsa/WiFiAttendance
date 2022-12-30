@@ -7,7 +7,7 @@ print("ESP8266 mode is: " .. wifi.getmode())
 -- Set the SSID of the module in AP mode and access password
 cfg={}
 cfg.ssid="ESP_" .. node.chipid()
-cfg.pwd="passw0rd"
+cfg.pwd="12345678"
 print("Chip ID: " .. node.chipid())
 print("ESP8266 SSID is: " .. cfg.ssid .. " and PASSWORD is: " .. cfg.pwd)
 
