@@ -1,20 +1,27 @@
 ##mqtt server data log to sqlite DB file by P.G.A.S Pinnagoda EA3050 Final project
-
+print("20sea061 P.G.A.S Pinnagoda EA 3050 final project")
+print("WiFi attendance system")
 import csv
 import json
 import sqlite3
 from pathlib import Path
 import paho.mqtt.client as mqtt
+from datetime import datetime
 
 # MQTT Settings 
-MQTT_Broker = "192.168.8.100"
+now = datetime.now()
+currentDateAndTime = now.strftime("%d%m%Y %H:%M:%S")
+print("current date and time is ",currentDateAndTime)
+print("#################")
+MQTT_Broker = "phys.cmb.ac.lk"
 MQTT_Port = 1883
 Keep_Alive_Interval = 45
 MQTT_Topic = "crowdtrace/#"
-DB_Name =  "crowd.db"
-###########################
-###########################
+DB_Name =currentDateAndTime+".db"
+print("Saved data base name :-",DB_Name)
 
+###########################
+###########################
 
 
 #####################
@@ -30,8 +37,12 @@ def on_message(mosq, obj, msg):
 	print("mqtt data recived")
 	data=str(msg.payload.decode("utf-8"))
 	print(data)
-	crowdtraceDataHandler(data)
-
+	try:
+		crowdtraceDataHandler(data)
+	except:
+		pass
+		
+		
 def on_subscribe(mosq, obj, mid, granted_qos):
  	print("on subscribe")
  	print("Subscription done to MQTT server waiting for data recived....")
@@ -89,7 +100,7 @@ def crowdtraceDataHandler(jsonData):
 				#Push into DB Table
 			try:
 				dbObj = DatabaseManager()
-				dbObj.add_del_update_db_record("insert into crData (mac,name,indexNo) values (?,?,?)",[macAddress,row[1],row[3]])
+				dbObj.add_del_update_db_record("insert into attendanceData (mac,name,indexNo) values (?,?,?)",[macAddress,row[1],row[3]])
 				del dbObj
 				print ("Inserted crowdtrace Data into Database.")
 				print ("")
@@ -113,12 +124,12 @@ def crowdtraceDataHandler(jsonData):
 ########################################
 
 # SQLite DB Name
-DB_Name =  "crowd.db"
+
 # SQLite DB Table Schema
 #change the table only get mac and name and index no
 TableSchema="""
-	 drop table if exists crData ;
-	 create table crData(
+	
+	 create table attendanceData(
   	 id integer primary key autoincrement,
   	 mac text unique,
   	 name text,
@@ -127,45 +138,26 @@ TableSchema="""
   
 	);
 
-	"""	
+	""" 
 
 #ton get all data written in database just delete unique in mac on TableSchama
 #in here unique constant use for not duplicating data on database
 #main program start here------------->>>>>>
 
 
-path_to_file = 'crowd.db' #database file name or path
-path = Path(path_to_file)
-
-if path.is_file():# to check DB file exist or not if exist delete crData table for save new data
-	print("The databse file exists")
-	conn = sqlite3.connect(DB_Name)
-	curs = conn.cursor()
-	try:
-		curs.executescript("DROP TABLE crData")
-		print("crData table deleted")
-	except:
-		print("crData table delete unsusscesfully because already deleted")
-	
-	curs.executescript(TableSchema)
-	curs.close()
-	conn.close()
-	
-else:
-	print("The file {path_to_file} does not exist create new DB file..")
 	
 ################################################
 
 	
 #create db table
 # SQLite DB Name
-	conn = sqlite3.connect(DB_Name)
-	curs = conn.cursor()
-	curs.executescript(TableSchema)
+conn = sqlite3.connect(DB_Name)
+curs = conn.cursor()
+curs.executescript(TableSchema)
 	
 	
-	curs.close()
-	conn.close()
+curs.close()
+conn.close()
 	
 ###############################################
 #import csv file data to new table
@@ -185,7 +177,7 @@ conn = sqlite3.connect(DB_Name)
 curs = conn.cursor()
 curs.executescript(TablePeopleData)	
 print("tabel create done")
-file = open("test.csv")
+file = open("peoples data.csv")
 print("fle open done")
 content = csv.reader(file)
 insertRecords="insert into peopleData (name,mac,indexNo) values( ?,?,?)"

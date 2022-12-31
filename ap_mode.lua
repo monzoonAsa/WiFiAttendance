@@ -56,7 +56,7 @@ function receiver(sck, data)
         
                 ssid=string.sub(data,ssid_end+1, password_start-2)
                 password=string.sub(data,password_end+1, mqtt_start-2)
-                mqttAddress=string.sub(data,mqtt_end+1, http_start-1)
+                mqttAddress=string.sub(data,mqtt_end+1, http_start-2)
 
                 --print("ESP8266 connecting to SSID: "..ssid.." with PASSWORD: "..password.. " and mqtt address : "..mqttAddress)
                 if ssid and password then
